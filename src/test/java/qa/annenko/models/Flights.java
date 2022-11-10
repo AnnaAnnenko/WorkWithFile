@@ -8,7 +8,7 @@ public class Flights {
     public String destination;
     public String departureTime;
     public List<String> cabinCrew;
-    public int meal;
+    public Meal meal;
 
     public static class Meal {
         public int hotMeal;
