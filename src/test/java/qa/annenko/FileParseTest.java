@@ -1,5 +1,6 @@
 package qa.annenko;
 
+import com.codeborne.pdftest.PDF;
 import com.codeborne.selenide.Selenide;
 import com.codeborne.selenide.SelenideElement;
 import com.codeborne.xlstest.XLS;
@@ -23,24 +24,36 @@ public class FileParseTest {
 
     @Test
     public void parseZipTest() throws Exception {
-        try(ZipFile zipFile = new ZipFile(new File("src/test/resources/TestData.zip"));
-            InputStream is = classLoader.getResourceAsStream("TestData.zip")) {
+        try (ZipFile zipFile = new ZipFile(new File("src/test/resources/TestData.zip"));
+             InputStream is = classLoader.getResourceAsStream("TestData.zip")) {
             ZipInputStream zis = new ZipInputStream(is);
             ZipEntry entry;
             while ((entry = zis.getNextEntry()) != null) {
                 String entryName = entry.getName();
-                    try (InputStream inputStream = zipFile.getInputStream(entry)){
-                    CSVReader csv = new CSVReader(new InputStreamReader(inputStream));
-                    List<String[]> content = csv.readAll();
-                    String[] row = content.get(1);
-                    assertThat(row[0]).isEqualTo("SU6454");
-                                    }
-//                try (InputStream inputStream = zipFile.getInputStream(entry)){
-//                    XLS xls = new XLS(inputStream);
-//                    assertThat(
-//                            xls.excel.getSheetAt(0).getRow(0).getCell(0).getStringCellValue()).isEqualTo("Номер рейса");
-//                                    }
-                System.out.println(entryName);
+                switch (entryName) {
+                    case "csv.csv":
+                        try (InputStream inputStream = zipFile.getInputStream(entry)) {
+                            CSVReader csv = new CSVReader(new InputStreamReader(inputStream));
+                            List<String[]> content = csv.readAll();
+                            String[] row = content.get(1);
+                            assertThat(row[0]).isEqualTo("SU6454");
+                        }
+                        break;
+                    case "Excel.xlsx":
+                        try (InputStream inputStream = zipFile.getInputStream(entry)) {
+                            XLS xls = new XLS(inputStream);
+                            assertThat(
+                                    xls.excel.getSheetAt(0).getRow(0).getCell(1).getStringCellValue())
+                                    .isEqualTo("SU6454");
+                        }
+                        break;
+                    case "PDF.pdf":
+                        try (InputStream inputStream = zipFile.getInputStream(entry)) {
+                            PDF pdf = new PDF(inputStream);
+                            assertThat(pdf.text).contains("SU6454");
+                        }
+                        break;
+                }
             }
         }
     }

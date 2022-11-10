@@ -1,0 +1,12 @@
+{
+  "flightNumber": "SU6454",
+  "destination": "Orenburg",
+  "departureTime": "5:25",
+  "cabinCrew": ["Ivanov", "Petrov", "Sidorov"],
+  "meal": {
+    "hotMeal": 120,
+    "water": 1500,
+    "juice": 1000
+  }
+}
+
